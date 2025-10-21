@@ -12,10 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -48,7 +45,9 @@ public class DemonicPartner extends TamableAnimal {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return FamiliarEntity.createAttributes().add(Attributes.ATTACK_DAMAGE, 9.0D);
+        return FamiliarEntity.createAttributes()
+                .add(Attributes.ATTACK_DAMAGE, 9.0D)
+                .add(Attributes.MAX_HEALTH, 60.00);
     }
 
     @Override
@@ -242,6 +241,16 @@ public class DemonicPartner extends TamableAnimal {
 
     @Override
     public boolean isInvulnerableTo(@NotNull DamageSource source) {
-        return super.isInvulnerableTo(source) || source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FLY_INTO_WALL);
+        return super.isInvulnerableTo(source) || source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.FALL);
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (this.isInvulnerableTo(pSource) || pSource.getEntity() == this.getOwner()) {
+            return false;
+        } else {
+            this.markHurt();
+            return false;
+        }
     }
 }
