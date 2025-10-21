@@ -48,7 +48,7 @@ public class DemonicPartner extends TamableAnimal {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return FamiliarEntity.createAttributes().add(Attributes.ATTACK_DAMAGE, 9.0D);
+        return FamiliarEntity.createAttributes().add(Attributes.ATTACK_DAMAGE, 9.0D).add(Attributes.MAX_HEALTH, 60.0);
     }
 
     @Override
@@ -230,6 +230,7 @@ public class DemonicPartner extends TamableAnimal {
 
     @Override
     public boolean doHurtTarget(Entity pEntity) {
+
         boolean flag = pEntity.hurt(this.damageSources().mobAttack(this), (float) ((int) this.getAttributeValue(Attributes.ATTACK_DAMAGE)));
         if (flag) {
             this.doEnchantDamageEffects(this, pEntity);
@@ -242,6 +243,16 @@ public class DemonicPartner extends TamableAnimal {
 
     @Override
     public boolean isInvulnerableTo(@NotNull DamageSource source) {
-        return super.isInvulnerableTo(source) || source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FLY_INTO_WALL);
+        return super.isInvulnerableTo(source) || source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FLY_INTO_WALL) || source.is(DamageTypes.FALL);
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (this.isInvulnerableTo(pSource) || pSource.getEntity() == this.getOwner()) {
+            return false;
+        } else {
+            this.markHurt();
+            return false;
+        }
     }
 }
